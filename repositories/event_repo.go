@@ -28,3 +28,13 @@ func (repo *EventRepository) GetEventByID(id uint) (models.Event, error) {
 	}
 	return event, nil
 }
+func(repo *EventRepository) GetAllEvents() ([]models.Event, error) {
+	var events [] models.Event 
+	if result := repo.DB.Find(&events); result.Error != nil {
+		return nil, result.Error
+	}
+	return events, nil
+ 
+}
+
+

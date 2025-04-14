@@ -23,3 +23,15 @@ func CreateEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Event created succesfuly", "event": event})
 
 }
+
+// GetAllEvents handles retrieving all events
+func GetAllEvents(c *gin.Context){
+	var events [] models.Event
+	if result := databases.DB.Find(&events); result.Error != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch events"})
+		return
+
+	}
+	c.JSON(http.StatusOK, events)
+	
+}

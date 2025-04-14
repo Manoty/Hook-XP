@@ -54,3 +54,25 @@ func (es *EventRequest) CreateEvent(request EventRequest) (EventResponse, error)
 		TicketPrice: createdEvent.TicketPrice,
 	}, nil
 }
+
+func (es *EventService) GetAllEvents() ([]EventResponse, error) {
+	events, err := es.repo.GetAllEvents()
+	if err != nil {
+		return nil, err
+
+	}
+	var eventResponse [] EventResponse
+	for _, events := range events {
+		eventResponse = append(eventResponse, EventResponse{
+			ID: events.ID,
+			Title: events.Title,
+			Description: events.Description,
+			Location: events.Location,
+			Date: events.Date,
+			TicketPrice: events.TicketPrice,
+
+	})
+
+	}
+	return eventResponse, nil
+}
