@@ -3,6 +3,7 @@ package databases
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -34,7 +35,21 @@ func ConnectDatabase() {
 
 	}
 
-	dsn := "host=localhost user=postgres password=N333336K41777757@2019 dbname=postgres port=5432 sslmode=disable TimeZone=Africa/Nairobi"
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_SSLMODE"),
+		os.Getenv("DB_TIMEZONE"),
+
+
+
+
+	)
 		// Connect to the database
 		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {

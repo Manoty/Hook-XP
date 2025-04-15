@@ -11,6 +11,8 @@ func SetupRoutes() *gin.Engine {
 	// Public routes
 	r.POST("/events", controllers.CreateEvent)
 	r.GET("/events", controllers.GetAllEvents)
+	r.GET("/events/:id", controllers.GetEventByID)
+	r.PUT("/events/:id", controllers.UpdateEvent)
 	
 
 	return r

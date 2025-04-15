@@ -1,10 +1,9 @@
 package services
 
-
 import (
 	"StreefySherehes/models"
 	"StreefySherehes/repositories"
-
+	"fmt"
 )
 
 type EventRequest struct {
@@ -33,7 +32,7 @@ func NewEventsService() *EventService {
 
 	}
 }
-func (es *EventRequest) CreateEvent(request EventRequest) (EventResponse, error) {
+func (es *EventService) CreateEvent(request EventRequest) (EventResponse, error) {
 	event := models.Event{
 		Title: request.Title,
 		Description: request.Description,
@@ -58,7 +57,7 @@ func (es *EventRequest) CreateEvent(request EventRequest) (EventResponse, error)
 func (es *EventService) GetAllEvents() ([]EventResponse, error) {
 	events, err := es.repo.GetAllEvents()
 	if err != nil {
-		return nil, err
+		return nil, err 
 
 	}
 	var eventResponse [] EventResponse
@@ -75,4 +74,46 @@ func (es *EventService) GetAllEvents() ([]EventResponse, error) {
 
 	}
 	return eventResponse, nil
+}
+func (es *EventService) GetEventByID(id uint) (EventResponse, error) {
+	event, err := es.repo.GetEventByID(id)
+	if err != nil {
+		return EventResponse{}, err
+	}
+	return EventResponse{
+		ID: event.ID,
+		Title: event.Title,
+		Description: event.Description,
+		Location: event.Location,
+		Date: event.Date,
+		TicketPrice: event.TicketPrice,
+	}, nil
+
+}
+// UpdateEvent updates an existing event
+func (es *EventService) UpdateEvent(id uint, request EventRequest) (EventResponse, error) {
+	// Check if the event exists
+	event, err := es.repo.GetEventByID(id)
+	if err != nil {
+		return EventResponse{}, fmt.Errorf("event not found: %w", err)
+	}
+	event = models.Event{
+		Title:       request.Title,
+		Description: request.Description,
+		Location:    request.Location,
+		Date:        request.Date,
+		TicketPrice: request.TicketPrice,
+	}
+	updatedEvent, err := es.repo.UpdateEvent(id, event)
+	if err != nil {
+		return EventResponse{}, err 
+	}
+	return EventResponse{
+		ID:          updatedEvent.ID,
+		Title:	   updatedEvent.Title,
+		Description: updatedEvent.Description,
+		Location:    updatedEvent.Location,
+		Date:     updatedEvent.Date,
+		TicketPrice: updatedEvent.TicketPrice,
+	},nil
 }
