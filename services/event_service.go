@@ -4,7 +4,7 @@ import (
 	"StreefySherehes/models"
 	"StreefySherehes/repositories"
 	"fmt"
-	"net/http"
+
 )
 
 type EventRequest struct {
@@ -29,7 +29,7 @@ type EventService struct {
 
 func NewEventsService() *EventService {
 	return &EventService{
-		repo: repositories.NewEventRepository(),
+		repo: repositories.NewRepository(),
 
 	}
 }
@@ -121,14 +121,13 @@ func (es *EventService) UpdateEvent(id uint, request EventRequest) (EventRespons
 
 // DeleteEvent deletes an event by ID
 func (es *EventService) DeleteEvent(id uint) error {
-	event, err := es.repo.GetEventByID(id)
+	_, err := es.repo.GetEventByID(id)
 	if err != nil {
 		return fmt.Errorf("event not found: %w", err)
 
 	}
-	err = es.repo.DeleteEvent(id)
-	if err != nil {
-		return fmt.Errorf("failed to delete event with id: %w",id, err)
+	if err = es.repo.DeleteEvent(id); err != nil{
+		return fmt.Errorf("failed to delete event with id %d: %w",id, err)
 	}
 
 	return nil

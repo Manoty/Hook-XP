@@ -1,8 +1,12 @@
 package main
 
 import (
+	
 	"StreefySherehes/databases"
+	
 	"StreefySherehes/routes"
+	
+
 	"fmt"
 )
 
@@ -10,6 +14,8 @@ func main() {
 	// Connect to the database
 	databases.ConnectDatabase()
 
+	//
+	
 	// Set up the router
 	r := routes.SetupRoutes()
 
