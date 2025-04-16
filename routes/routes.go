@@ -13,6 +13,7 @@ func SetupRoutes() *gin.Engine {
 	r.GET("/events", controllers.GetAllEvents)
 	r.GET("/events/:id", controllers.GetEventByID)
 	r.PUT("/events/:id", controllers.UpdateEvent)
+	r.DELETE("/events/:id", controllers.DeleteEvent)
 	
 
 	return r

@@ -83,3 +83,27 @@ func UpdateEvent(c *gin.Context) {
 	}	
 	c.JSON(http.StatusOK, gin.H{"message": "Efent updated successfuly", "event": event})
 }
+// DeleteEvent handles deleting an event
+func DeleteEvent(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid event ID"})
+		return
+	}
+
+	// Find the event by ID
+	var event models.Event
+	if result := databases.DB.First(&event, uint(id)); result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "event not found"})
+		return
+	}
+	
+	// Delete the event from the database
+	if result := databases.DB.Delete(&event); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Event deleted successfuly", "event": event})
+
+}

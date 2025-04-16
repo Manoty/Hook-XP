@@ -45,4 +45,10 @@ func (repo *EventRepository) UpdateEvent(id uint, event models.Event) (models.Ev
 	}
 	return event, nil
 }
+func (repo *EventRepository) DeleteEvent(id uint) error {
+	if result := repo.DB.Unscoped().Where("id = ?", id).Delete(&models.Event{}); result.Error != nil {
+		return result.Error
 
+	}
+	return nil
+}
