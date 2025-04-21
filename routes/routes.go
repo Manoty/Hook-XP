@@ -28,6 +28,10 @@ func SetupRoutes() *gin.Engine {
 
 
 	r.POST("/signup", authController.SignUp)
+	r.POST("/login", authController.Login)
+
+
+	r.PUT("/changePassword", authController.ChangePassword)
 	
 
 	return r

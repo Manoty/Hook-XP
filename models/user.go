@@ -1,6 +1,8 @@
 package models
 
 import (
+
+
 	"gorm.io/gorm"
 )
 
@@ -21,3 +23,17 @@ type UserInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type LoginInput struct {
+	Email string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type ChangePasswordInput struct {
+	Email string `json:"email" binding:"required"`
+	OldPassword string `json:"old_Password" binding:"required"`
+	NewPassword string `json:"new_Password" binding:"required"`
+}
+type LoginResponse struct {
+	User *User `json:"user"`
+	Token string `json:"token"`
+}

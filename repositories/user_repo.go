@@ -23,10 +23,14 @@ func (repo *UserRepository) CreateUser(user *models.User) error {
 		return databases.DB.Create(user).Error
 	}
 
-func (repo *UserRepository) GetUserByEmail(email string) (models.User, error) {
+func (repo *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
-if err := repo.DB.Where("email = ?", email).First(&user).Error; err != nil {
-		return models.User{}, err
+if err := databases.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
 	}
-	return user, nil
+	return &user, nil
+}
+
+func(repo *UserRepository) UpdatePassword(user *models.User) error {
+	return repo.DB.Model(user).Update("password", user.Password).Error
 }
