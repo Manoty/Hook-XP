@@ -7,7 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("your_secret_key")
+var jwtKey = []byte("secret_key")
 
 // JWTClaims is a struct that represents the claims in a JWT token.
 type JWTClaims struct {

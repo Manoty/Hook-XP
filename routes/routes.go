@@ -1,22 +1,17 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"StreefySherehes/controllers"
-	
-	"StreefySherehes/services"
+	"StreefySherehes/middlewares"
+
+	"github.com/gin-gonic/gin"
+
 	"StreefySherehes/repositories"
+	"StreefySherehes/services"
 )
 
 func SetupRoutes() *gin.Engine {
 	r := gin.Default()
-
-	// event routes
-	r.POST("/events", controllers.CreateEvent)
-	r.GET("/events", controllers.GetAllEvents)
-	r.GET("/events/:id", controllers.GetEventByID)
-	r.PUT("/events/:id", controllers.UpdateEvent)
-	r.DELETE("/events/:id", controllers.DeleteEvent)
 
 
 	//auth route setup
@@ -26,12 +21,36 @@ func SetupRoutes() *gin.Engine {
 	authController := controllers.NewAuthController(authService)
 
 
+	// protected routes
+	protected := r.Group("/")
+	protected.Use(middlewares.AuthMiddleware())
+	{
+		// event routes
+	protected.POST("/events", controllers.CreateEvent)
+	protected.GET("/events", controllers.GetAllEvents)
+	protected.GET("/events/:id", controllers.GetEventByID)
+	protected.PUT("/events/:id", controllers.UpdateEvent)
+	protected.DELETE("/events/:id", controllers.DeleteEvent)
+
+
+
+
+	// change password route
+	protected.PUT("/changePassword", authController.ChangePassword)
+
+	}
+
+	
+
+
+	
+
 
 	r.POST("/signup", authController.SignUp)
 	r.POST("/login", authController.Login)
 
 
-	r.PUT("/changePassword", authController.ChangePassword)
+	
 	
 
 	return r
