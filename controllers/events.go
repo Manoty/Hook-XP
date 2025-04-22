@@ -15,7 +15,24 @@ func CreateEvent(c *gin.Context) {
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	
 	}
+	/// get user ID from the context
+	userIDInterface, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+	userID := userIDInterface.(uint)
+	event = models.Event{
+		Title: event.Title,
+		Location: event.Location,
+		Date: event.Date,
+		UserID: userID, // own the event to the authenticated user
+	}
+
+
+
 	//save event to DB
 	if result := databases.DB.Create(&event); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
@@ -70,7 +87,16 @@ func UpdateEvent(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "event not found"})
 		return
 	}
+	//get user ID from the context
+	userIDInterface, _ := c.Get("user_id")
+	userID := userIDInterface.(uint)
 
+	// Check if the event belongs to the authenticated user
+	if event.UserID != userID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "you are not authorized to update this event"})
+		return
+
+	}
 	// Bind the request body to the event struct
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -96,6 +122,15 @@ func DeleteEvent(c *gin.Context) {
 	var event models.Event
 	if result := databases.DB.First(&event, uint(id)); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "event not found"})
+		return
+	}
+	//get user ID from the context
+	userIDInterface, _ := c.Get("user_id")
+	userID := userIDInterface.(uint)
+
+	// Check if the event belongs to the authenticated user
+	if event.UserID != userID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "you are not authorized to delete this event"})
 		return
 	}
 	

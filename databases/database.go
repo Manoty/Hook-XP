@@ -62,6 +62,7 @@ func ConnectDatabase() {
 	
 		// Auto-migrate will create the table if it doesn't exist
 		DB.AutoMigrate(&Event{})
+		DB.AutoMigrate(&models.Event{})
 		DB.AutoMigrate(&models.User{})
 	}
 
