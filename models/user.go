@@ -4,6 +4,7 @@ import (
 
 
 	"gorm.io/gorm"
+	"time"
 )
 
 
@@ -14,6 +15,9 @@ type User struct {
 	Username string `json:"username"`
 	Email string `json:"email"`
 	Password string `json:"password"`
+	Is2FAEnabled bool 
+	OTP string
+	OTPExpiry time.Time
 	
 }
 

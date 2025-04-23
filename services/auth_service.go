@@ -1,22 +1,35 @@
 package services
 
 import (
-	"StreefySherehes/models"
+
 	"StreefySherehes/dto"
+	"StreefySherehes/infra"
+	"StreefySherehes/models"
 	"StreefySherehes/repositories"
 	"StreefySherehes/utils"
 	"errors"
+	"fmt"
+	"time"
+	"context"
+	"math/rand"
 
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
 	repo repositories.UserRepository
+	otpSender infra.OTPSender 
+	redis *redis.Client
 }
 
 
-func NewAuthService(repo repositories.UserRepository) *AuthService {
-	return &AuthService{repo: repo}
+func NewAuthService(repo repositories.UserRepository, redisClient *redis.Client, sender infra.OTPSender) *AuthService {
+	return &AuthService{
+		repo: repo,
+		otpSender: sender,
+		redis: redisClient,
+	}
 }
 
 func (as *AuthService) RegisterUser(input models.UserInput) error {
@@ -82,4 +95,36 @@ func (as *AuthService) ChangePassword(input models.ChangePasswordInput) error {
 	user.Password = string(hashedPassword)
 	return as.repo.UpdatePassword(user)
 
+}
+func (as *AuthService) SendOTP(email string) error {
+	otpCode := utils.GenerateOTP()
+	
+	key := fmt.Sprintf("otp:%s", email)
+	err := as.redis.Set(context.Background(), key, otpCode, 5*time.Minute).Err()
+	if err != nil {
+		return err
+	}
+
+	// Send the OTP to the user's email
+	return as.otpSender.SendOTP(email, otpCode)
+}
+
+func (as *AuthService) VerifyfOTP(email, inputCode string)(bool, error) {
+	key := fmt.Sprintf("otp:%s", email)
+	storedCode, err := as.redis.Get(context.Background(), key).Result()
+	if err != nil {
+		return false, fmt.Errorf("OTP expired or not found")
+	}
+
+	if inputCode != storedCode {
+		return false, fmt.Errorf("invalid OTP")
+
+	}
+	//Clear OTP from redis after succesful verification
+	as.redis.Del(context.Background(), key)
+
+	return true, nil
+}
+func generateOTP() string{
+	return fmt.Sprintf("%06d", rand.Intn(1000000))
 }

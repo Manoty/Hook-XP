@@ -18,7 +18,7 @@ func CreateEvent(c *gin.Context) {
 	
 	}
 	/// get user ID from the context
-	userIDInterface, exists := c.Get("user_id")
+	userIDInterface, exists := c.Get("org_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
@@ -28,7 +28,7 @@ func CreateEvent(c *gin.Context) {
 		Title: event.Title,
 		Location: event.Location,
 		Date: event.Date,
-		UserID: userID, // own the event to the authenticated user
+		OrganizerID: userID, // own the event to the authenticated user
 	}
 
 
@@ -88,11 +88,11 @@ func UpdateEvent(c *gin.Context) {
 		return
 	}
 	//get user ID from the context
-	userIDInterface, _ := c.Get("user_id")
-	userID := userIDInterface.(uint)
+	userIDInterface, _ := c.Get("org_id")
+	OrganizerID := userIDInterface.(uint)
 
 	// Check if the event belongs to the authenticated user
-	if event.UserID != userID {
+	if event.OrganizerID != OrganizerID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "you are not authorized to update this event"})
 		return
 
@@ -125,11 +125,11 @@ func DeleteEvent(c *gin.Context) {
 		return
 	}
 	//get user ID from the context
-	userIDInterface, _ := c.Get("user_id")
+	userIDInterface, _ := c.Get("org_id")
 	userID := userIDInterface.(uint)
 
 	// Check if the event belongs to the authenticated user
-	if event.UserID != userID {
+	if event.OrganizerID != userID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "you are not authorized to delete this event"})
 		return
 	}

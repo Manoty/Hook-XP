@@ -3,8 +3,10 @@ package routes
 import (
 	"StreefySherehes/controllers"
 	"StreefySherehes/middlewares"
+	"StreefySherehes/infra"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 
 	"StreefySherehes/repositories"
 	"StreefySherehes/services"
@@ -16,12 +18,20 @@ func SetupRoutes() *gin.Engine {
 
 	//auth route setup
 	userRepo := repositories.NewUserRepository()
-	authService := services.NewAuthService(userRepo)
+	// Initialize Redis client
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: "localhost:6379", // Replace with your Redis server address
+	})
+
+	// Initialize OTP sender
+	otpSender := infra.NewOTPSender() // Replace with the actual initialization of infra.OTPSender
+
+	authService := services.NewAuthService(userRepo, redisClient, otpSender)
 	// Initialize the auth controller
 	authController := controllers.NewAuthController(authService)
 
 
-	// protected routes
+	// protected routess
 	protected := r.Group("/")
 	protected.Use(middlewares.AuthMiddleware())
 	{
@@ -48,6 +58,7 @@ func SetupRoutes() *gin.Engine {
 
 	r.POST("/signup", authController.SignUp)
 	r.POST("/login", authController.Login)
+	r.POST("/send-otp", authController.SendOTP)
 
 
 	

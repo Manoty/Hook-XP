@@ -14,3 +14,7 @@ type ChangePasswordResponse struct {
 	Message string `json:"message"`
 	User UserDTO `json:"user"`
 }
+type OTPVerifyDTO struct {
+	Email string `json:"email"`
+	OTP string `json:"otp"`
+}

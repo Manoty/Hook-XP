@@ -48,6 +48,22 @@ func(ac *AuthController) Login(c *gin.Context) {
 	})
 	
 }
+func (ac AuthController) SendOTP(c *gin.Context) {
+	var request struct {
+		Email string `json:"email"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+	err := ac.service.SendOTP(request.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send OTP"})
+		return
+
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "OTP Sent successfully"})
+}
 
 func (ac *AuthController) ChangePassword(c *gin.Context) {
 	var input models.ChangePasswordInput
