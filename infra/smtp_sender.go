@@ -2,8 +2,11 @@ package infra
 
 import (
 	"fmt"
+	"log"
 	"net/smtp"
+	"os"
 )
+
 // SmtpSender is a struct that implements the OTPSender interface
 type SmtpSender struct {
 	Host   string
@@ -23,17 +26,23 @@ func (s *SmtpSender) SendOTP(email, code string) error {
 	msg := []byte(fmt.Sprintf("To: %s\r\nSubject: Your OTP Code\r\n\r\nYour OTP code is: %s", email, code))
 	
 	// send the email
-	return smtp.SendMail(addr, auth, s.From, []string{email}, msg)
+	err := smtp.SendMail(addr, auth, s.From, []string{email}, msg)
+	if err != nil {
+		log.Printf("send otp failed for  %s: %v", email, err)
+		return err
+	}
+	return nil
 
 }
 //NewOTPSender initializes and returns a configured smtp sender
 func NewOTPSender() *SmtpSender {
 	return &SmtpSender{
-	Host : "smtp.example.com",
+	Host : "smtp.gmail.com",
 	Port : 587,
-	Username : "manoti@testing.com",
-	Password : "app_password",
-	From: "youremail@gmail.com",
+	Username : "info.freshlyfarms5@gmail.com",
+	//Password : "jbzh yrga gils yabk",
+	Password : os.Getenv("SMTP_PASSWORD"),
+	From: "info.freshlyfarms5@gmail.com",
 	}
 
 

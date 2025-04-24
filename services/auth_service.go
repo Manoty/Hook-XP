@@ -2,7 +2,7 @@ package services
 
 import (
 
-	"StreefySherehes/dto"
+
 	"StreefySherehes/infra"
 	"StreefySherehes/models"
 	"StreefySherehes/repositories"
@@ -47,7 +47,9 @@ func (as *AuthService) RegisterUser(input models.UserInput) error {
 	return as.repo.CreateUser(&user)
 
 }
-func (as *AuthService) LoginUser(input models.LoginInput) (*dto.LoginResponse, error) {
+//login without otp 
+
+/*func (as *AuthService) LoginUser(input models.LoginInput) (*dto.LoginResponse, error) {
 	user, err := as.repo.GetUserByEmail(input.Email)
 	if err != nil {
 		return nil, errors.New("invalid email or password")
@@ -73,7 +75,20 @@ func (as *AuthService) LoginUser(input models.LoginInput) (*dto.LoginResponse, e
 	},
 	Token: token,
 	}, nil
+*/
+func (as *AuthService) VerifyUserCredentials(email, password string) (*models.User, error) {
+	user, err := as.repo.GetUserByEmail(email)
+	if err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	return user, nil
 }
+
 
 func (as *AuthService) ChangePassword(input models.ChangePasswordInput) error {
 	//retrieve user by email
@@ -125,6 +140,12 @@ func (as *AuthService) VerifyfOTP(email, inputCode string)(bool, error) {
 
 	return true, nil
 }
-func generateOTP() string{
+func (as *AuthService) GenerateOTP() string{
 	return fmt.Sprintf("%06d", rand.Intn(1000000))
 }
+
+func (as *AuthService) GetUserByEmail(email string) (*models.User, error) {
+	return as.repo.GetUserByEmail(email)
+}
+
+

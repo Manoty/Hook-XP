@@ -28,6 +28,10 @@ func main() {
 	userRepo := repositories.NewUserRepository()
 	authService := services.NewAuthService(userRepo, redisClient, smtpSender)
 
+	infraSender := infra.NewOTPSender()
+	authService = services.NewAuthService(userRepo, redisClient, infraSender)
+
+
 	email := "user@example.com"
 	if err := authService.SendOTP(email); err != nil {
 		fmt.Println("failed to send otp:", err)

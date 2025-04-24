@@ -59,6 +59,7 @@ func SetupRoutes() *gin.Engine {
 	r.POST("/signup", authController.SignUp)
 	r.POST("/login", authController.Login)
 	r.POST("/send-otp", authController.SendOTP)
+	r.POST("/verify-otp", authController.VerifyOTP)
 
 
 	
